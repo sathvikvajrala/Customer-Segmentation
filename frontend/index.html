@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Segmentation Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" rx="6" fill="#1D4ED8" />
+                    <path
+                        d="M12 11C13.6569 11 15 9.65685 15 8C15 6.34315 13.6569 5 12 5C10.3431 5 9 6.34315 9 8C9 9.65685 10.3431 11 12 11Z"
+                        fill="white" />
+                    <path d="M6 18C6 15.7909 7.79086 14 10 14H14C16.2091 14 18 15.7909 18 18" stroke="white"
+                        stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>Customer Segmentation Dashboard</h1>
+                <p>K-Means Clustering Model | <span id="headerCustomerCount">2,236</span> Customers | 4 Segments</p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <div class="nav-wrapper">
+            <nav class="tabs">
+                <button class="tab active" data-target="overview">Overview</button>
+                <button class="tab" data-target="predict">Predict Segment</button>
+                <button class="tab" data-target="details">Segment Details</button>
+                <button class="tab" data-target="data">Data Explorer</button>
+            </nav>
+        </div>
+
+        <main class="main-content">
+            <!-- OVERVIEW SECTION -->
+            <section id="overview" class="section active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <p class="metric-title">Total Customers</p>
+                        <h2 class="metric-value" id="kpiTotalCustomers">2,236</h2>
+                        <div class="metric-icon blue-bg">👥</div>
+                    </div>
+                    <div class="metric-card">
+                        <p class="metric-title">Segments</p>
+                        <h2 class="metric-value" id="kpiSegments">4</h2>
+                        <div class="metric-icon purple-bg">📈</div>
+                    </div>
+                    <div class="metric-card">
+                        <p class="metric-title">Avg Income</p>
+                        <h2 class="metric-value" id="kpiAvgIncome">$51,952</h2>
+                        <div class="metric-icon green-bg">💲</div>
+                    </div>
+                    <div class="metric-card">
+                        <p class="metric-title">Avg Spend</p>
+                        <h2 class="metric-value" id="kpiAvgSpend">$606</h2>
+                        <div class="metric-icon orange-bg">🛒</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Customer Distribution by Segment</h3>
+                        <div class="chart-container pie-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Average Metrics by Segment</h3>
+                        <div class="chart-container bar-container">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="segments-grid">
+                    <div class="segment-card" style="border-top: 4px solid #8B5CF6">
+                        <h3>Premium Loyal</h3>
+                        <div class="segment-stats">
+                            <div class="stat-row"><span>Customers:</span> <strong id="segPremiumCount">227</strong></div>
+                            <div class="stat-row"><span>Avg Income:</span> <strong id="segPremiumIncome">$77,237</strong></div>
+                            <div class="stat-row"><span>Avg Spend:</span> <strong id="segPremiumSpend">$1,517</strong></div>
+                            <div class="stat-row"><span>Avg Age:</span> <strong id="segPremiumAge">57 yrs</strong></div>
+                        </div>
+                    </div>
+                    <div class="segment-card" style="border-top: 4px solid #EF4444">
+                        <h3>Budget-Conscious</h3>
+                        <div class="segment-stats">
+                            <div class="stat-row"><span>Customers:</span> <strong id="segBudgetCount">973</strong></div>
+                            <div class="stat-row"><span>Avg Income:</span> <strong id="segBudgetIncome">$34,054</strong></div>
+                            <div class="stat-row"><span>Avg Spend:</span> <strong id="segBudgetSpend">$97</strong></div>
+                            <div class="stat-row"><span>Avg Age:</span> <strong id="segBudgetAge">54 yrs</strong></div>
+                        </div>
+                    </div>
+                    <div class="segment-card" style="border-top: 4px solid #3B82F6">
+                        <h3>High-Value</h3>
+                        <div class="segment-stats">
+                            <div class="stat-row"><span>Customers:</span> <strong id="segHighCount">627</strong></div>
+                            <div class="stat-row"><span>Avg Income:</span> <strong id="segHighIncome">$70,207</strong></div>
+                            <div class="stat-row"><span>Avg Spend:</span> <strong id="segHighSpend">$1,066</strong></div>
+                            <div class="stat-row"><span>Avg Age:</span> <strong id="segHighAge">60 yrs</strong></div>
+                        </div>
+                    </div>
+                    <div class="segment-card" style="border-top: 4px solid #F59E0B">
+                        <h3>Deal-Seeking Parents</h3>
+                        <div class="segment-stats">
+                            <div class="stat-row"><span>Customers:</span> <strong id="segDealCount">409</strong></div>
+                            <div class="stat-row"><span>Avg Income:</span> <strong id="segDealIncome">$52,515</strong></div>
+                            <div class="stat-row"><span>Avg Spend:</span> <strong id="segDealSpend">$605</strong></div>
+                            <div class="stat-row"><span>Avg Age:</span> <strong id="segDealAge">61 yrs</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insights-card">
+                    <h3 class="insights-title">Key Insights</h3>
+                    <ul class="insights-list">
+                        <li><strong>Premium Loyal</strong> customers have the highest lifetime value with avg income of
+                            $77,237</li>
+                        <li><strong>Deal-Seeking Parents</strong> show 5.3x more deal purchases than other segments</li>
+                        <li><strong>High-Value</strong> customers maintain consistent purchase patterns with strong
+                            engagement</li>
+                        <li><strong>Budget-Conscious</strong> segment represents 44% of total customers - opportunity
+                            for retention campaigns</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- PREDICT SEGMENT SECTION -->
+            <section id="predict" class="section">
+                <div class="predict-grid">
+                    <div class="form-card">
+                        <h3>✨ Customer Information</h3>
+                        <form id="predictForm" class="predict-form">
+                            <div class="form-group-row">
+                                <div class="form-group">
+                                    <label>Income ($)</label>
+                                    <input type="number" id="income" value="50000" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Age</label>
+                                    <input type="number" id="age" value="40" required>
+                                </div>
+                            </div>
+                            <div class="form-group-row">
+                                <div class="form-group">
+                                    <label>Total Spend ($)</label>
+                                    <input type="number" id="totalSpend" value="500" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Total Purchases</label>
+                                    <input type="number" id="totalPurchases" value="15" required>
+                                </div>
+                            </div>
+                            <div class="form-group-row">
+                                <div class="form-group">
+                                    <label>Dependents</label>
+                                    <input type="number" id="dependents" value="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Deal Purchases</label>
+                                    <input type="number" id="dealPurchases" value="2" required>
+                                </div>
+                            </div>
+                            <div class="form-group-row">
+                                <div class="form-group">
+                                    <label>Campaigns Accepted</label>
+                                    <input type="number" id="campaigns" value="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Web Visits/Month</label>
+                                    <input type="number" id="webVisits" value="5" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Recency (days since last purchase)</label>
+                                <input type="number" id="recency" value="30" required>
+                            </div>
+                            <button type="submit" class="btn-primary" id="predictBtn">Predict Customer Segment</button>
+                        </form>
+                    </div>
+
+                    <!-- Result Container -->
+                    <div id="predictRight">
+                        <!-- Placeholder State -->
+                        <div class="result-card empty" id="resultPlaceholder">
+                            <div class="icon-circle">!</div>
+                            <p>Enter customer information and<br>click "Predict Customer<br>Segment" to see the results.
+                            </p>
+                        </div>
+
+                        <!-- Prediction Active State -->
+                        <div class="result-card hidden" id="resultContent">
+                            <div class="result-header">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m3 16 4-4 4 4 4-4 4 4"></path>
+                                    <path d="M18 12V7h-5"></path>
+                                </svg>
+                                <h3>Prediction Result</h3>
+                            </div>
+                            <p class="predicted-label">Predicted Segment</p>
+                            <h2 class="predicted-segment-name" id="predName">Deal-Seeking Parents</h2>
+
+                            <div class="confidence-section">
+                                <div class="confidence-label">
+                                    <span>Confidence Level</span>
+                                    <span id="predConfText">50%</span>
+                                </div>
+                                <div class="confidence-bar-bg">
+                                    <div class="confidence-bar-fill" id="predConfBar" style="width: 50%"></div>
+                                </div>
+                            </div>
+
+                            <div class="reason-box">
+                                <div class="reason-title">Why this segment?</div>
+                                <div class="reason-text" id="predReasonText">
+                                    2 deal purchases and 1 dependent(s) indicate price-sensitive family profile.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Characteristics Box -->
+                        <div class="characteristics-card hidden" id="charCard">
+                            <h3>Segment Characteristics</h3>
+                            <p class="characteristics-desc" id="predCharDesc">Price-sensitive customers who respond well
+                                to discounts and promotions. Often have dependents.</p>
+
+                            <div class="metrics-mini-grid">
+                                <div class="mini-metric">
+                                    <p class="mini-label">Avg Income</p>
+                                    <p class="mini-value" id="predAvgIncome">$52,515</p>
+                                </div>
+                                <div class="mini-metric">
+                                    <p class="mini-label">Avg Spend</p>
+                                    <p class="mini-value" id="predAvgSpend">$605</p>
+                                </div>
+                                <div class="mini-metric">
+                                    <p class="mini-label">Avg Purchases</p>
+                                    <p class="mini-value" id="predAvgPurchases">15.2</p>
+                                </div>
+                                <div class="mini-metric">
+                                    <p class="mini-label">Customers</p>
+                                    <p class="mini-value" id="predCount">409</p>
+                                </div>
+                            </div>
+
+                            <div class="strategies-mini">
+                                <h4>Recommended Strategies:</h4>
+                                <ul class="strategy-list-mini" id="predStrategies">
+                                    <li>Launch targeted promotional campaigns</li>
+                                    <li>Offer bundle deals and family packages</li>
+                                    <li>Send discount notifications and flash sales</li>
+                                    <li>Create loyalty points for bulk purchases</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEGMENT DETAILS SECTION -->
+            <section id="details" class="section">
+                <!-- Premium Loyal -->
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <div class="detail-title-group">
+                            <div class="detail-icon" style="background:#8B5CF6">🎯</div>
+                            <div>
+                                <h2>Premium Loyal</h2>
+                                <p>227 customers (10% of total)</p>
+                            </div>
+                        </div>
+                        <div class="detail-value">
+                            <p>Avg Lifetime Value</p>
+                            <h2>$1,517</h2>
+                        </div>
+                    </div>
+                    <div class="detail-body">
+                        <h3>👥 Segment Profile</h3>
+                        <p>High-income, high-spending customers with strong loyalty. They make consistent purchases and
+                            have minimal dependents.</p>
+
+                        <h3 class="mt-4">📈 Key Metrics</h3>
+                        <div class="metrics-grid detail-metrics">
+                            <div class="m-card"><span>Average Income</span><strong>$77,237</strong></div>
+                            <div class="m-card"><span>Average Spend</span><strong>$1,517</strong></div>
+                            <div class="m-card"><span>Average Purchases</span><strong>19.6</strong></div>
+                            <div class="m-card"><span>Average Age</span><strong>57 yrs</strong></div>
+                            <div class="m-card"><span>Avg Dependents</span><strong>0.2</strong></div>
+                            <div class="m-card"><span>Campaigns Accepted</span><strong>1.6</strong></div>
+                            <div class="m-card"><span>Deal Purchases</span><strong>1.3</strong></div>
+                            <div class="m-card"><span>Total Customers</span><strong>227</strong></div>
+                        </div>
+
+                        <h3 class="mt-4">💡 Actionable Business Strategies</h3>
+                        <div class="strategies-box" style="background: #F3F4F6">
+                            <ol class="styled-list purple-list">
+                                <li><span>1</span> Implement exclusive VIP loyalty programs</li>
+                                <li><span>2</span> Offer premium product lines and early access</li>
+                                <li><span>3</span> Provide personalized concierge services</li>
+                                <li><span>4</span> Create invitation-only events and experiences</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget-Conscious -->
+                <div class="detail-card">
+                    <div class="detail-header" style="background: #FEF2F2">
+                        <div class="detail-title-group">
+                            <div class="detail-icon" style="background:#EF4444">🎯</div>
+                            <div>
+                                <h2>Budget-Conscious</h2>
+                                <p>973 customers (44% of total)</p>
+                            </div>
+                        </div>
+                        <div class="detail-value">
+                            <p>Avg Lifetime Value</p>
+                            <h2>$97</h2>
+                        </div>
+                    </div>
+                    <div class="detail-body">
+                        <h3>👥 Segment Profile</h3>
+                        <p>Low engagement customers with limited spending. Require cost-effective targeting strategies.
+                        </p>
+
+                        <h3 class="mt-4">📈 Key Metrics</h3>
+                        <div class="metrics-grid detail-metrics">
+                            <div class="m-card"><span>Average Income</span><strong>$34,054</strong></div>
+                            <div class="m-card"><span>Average Spend</span><strong>$97</strong></div>
+                            <div class="m-card"><span>Average Purchases</span><strong>5.8</strong></div>
+                            <div class="m-card"><span>Average Age</span><strong>54 yrs</strong></div>
+                            <div class="m-card"><span>Avg Dependents</span><strong>1.2</strong></div>
+                            <div class="m-card"><span>Campaigns Accepted</span><strong>0.1</strong></div>
+                            <div class="m-card"><span>Deal Purchases</span><strong>1.8</strong></div>
+                            <div class="m-card"><span>Total Customers</span><strong>973</strong></div>
+                        </div>
+
+                        <h3 class="mt-4">💡 Actionable Business Strategies</h3>
+                        <div class="strategies-box" style="background: #F3F4F6">
+                            <ol class="styled-list red-list">
+                                <li><span>1</span> Focus on value-based messaging</li>
+                                <li><span>2</span> Offer entry-level products and services</li>
+                                <li><span>3</span> Use low-cost digital marketing channels</li>
+                                <li><span>4</span> Provide occasional incentives for re-engagement</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High-Value -->
+                <div class="detail-card">
+                    <div class="detail-header" style="background: #EFF6FF">
+                        <div class="detail-title-group">
+                            <div class="detail-icon" style="background:#3B82F6">🎯</div>
+                            <div>
+                                <h2>High-Value</h2>
+                                <p>627 customers (28% of total)</p>
+                            </div>
+                        </div>
+                        <div class="detail-value">
+                            <p>Avg Lifetime Value</p>
+                            <h2>$1,066</h2>
+                        </div>
+                    </div>
+                    <div class="detail-body">
+                        <h3>👥 Segment Profile</h3>
+                        <p>Strong revenue generators with consistent purchase behavior. Moderate to high income with
+                            good engagement.</p>
+
+                        <h3 class="mt-4">📈 Key Metrics</h3>
+                        <div class="metrics-grid detail-metrics">
+                            <div class="m-card"><span>Average Income</span><strong>$70,207</strong></div>
+                            <div class="m-card"><span>Average Spend</span><strong>$1,066</strong></div>
+                            <div class="m-card"><span>Average Purchases</span><strong>18.7</strong></div>
+                            <div class="m-card"><span>Average Age</span><strong>60 yrs</strong></div>
+                            <div class="m-card"><span>Avg Dependents</span><strong>0.5</strong></div>
+                            <div class="m-card"><span>Campaigns Accepted</span><strong>0.2</strong></div>
+                            <div class="m-card"><span>Deal Purchases</span><strong>1.6</strong></div>
+                            <div class="m-card"><span>Total Customers</span><strong>627</strong></div>
+                        </div>
+
+                        <h3 class="mt-4">💡 Actionable Business Strategies</h3>
+                        <div class="strategies-box" style="background: #F3F4F6">
+                            <ol class="styled-list blue-list">
+                                <li><span>1</span> Cross-sell and upsell premium products</li>
+                                <li><span>2</span> Send personalized product recommendations</li>
+                                <li><span>3</span> Offer tier-based rewards programs</li>
+                                <li><span>4</span> Maintain regular engagement through quality content</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deal-Seeking Parents -->
+                <div class="detail-card">
+                    <div class="detail-header" style="background: #FFFBEB">
+                        <div class="detail-title-group">
+                            <div class="detail-icon" style="background:#F59E0B">🎯</div>
+                            <div>
+                                <h2>Deal-Seeking Parents</h2>
+                                <p>409 customers (18% of total)</p>
+                            </div>
+                        </div>
+                        <div class="detail-value">
+                            <p>Avg Lifetime Value</p>
+                            <h2>$605</h2>
+                        </div>
+                    </div>
+                    <div class="detail-body">
+                        <h3>👥 Segment Profile</h3>
+                        <p>Price-sensitive customers who respond well to discounts and promotions. Often have
+                            dependents.</p>
+
+                        <h3 class="mt-4">📈 Key Metrics</h3>
+                        <div class="metrics-grid detail-metrics">
+                            <div class="m-card"><span>Average Income</span><strong>$52,515</strong></div>
+                            <div class="m-card"><span>Average Spend</span><strong>$605</strong></div>
+                            <div class="m-card"><span>Average Purchases</span><strong>15.2</strong></div>
+                            <div class="m-card"><span>Average Age</span><strong>61 yrs</strong></div>
+                            <div class="m-card"><span>Avg Dependents</span><strong>1.5</strong></div>
+                            <div class="m-card"><span>Campaigns Accepted</span><strong>0.2</strong></div>
+                            <div class="m-card"><span>Deal Purchases</span><strong>5.3</strong></div>
+                            <div class="m-card"><span>Total Customers</span><strong>409</strong></div>
+                        </div>
+
+                        <h3 class="mt-4">💡 Actionable Business Strategies</h3>
+                        <div class="strategies-box" style="background: #F3F4F6">
+                            <ol class="styled-list orange-list">
+                                <li><span>1</span> Launch targeted promotional campaigns</li>
+                                <li><span>2</span> Offer bundle deals and family packages</li>
+                                <li><span>3</span> Send discount notifications and flash sales</li>
+                                <li><span>4</span> Create loyalty points for bulk purchases</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DATA EXPLORER SECTION -->
+            <section id="data" class="section">
+                <div class="data-controls-card">
+                    <div class="data-header">
+                        <div class="search-box">
+                            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" id="searchInput" placeholder="Search by segment, income, or age...">
+                        </div>
+                        <div class="filter-box">
+                            <select id="segmentFilter">
+                                <option value="All">All Segments</option>
+                                <option value="Premium Loyal">Premium Loyal</option>
+                                <option value="High-Value">High-Value</option>
+                                <option value="Deal-Seeking Parents">Deal-Seeking Parents</option>
+                                <option value="Budget-Conscious">Budget-Conscious</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="data-count" id="showingLabel">Showing 1-20 of <span id="totalDataCount">2236</span> customers</p>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>SEGMENT</th>
+                                <th>INCOME</th>
+                                <th>AGE</th>
+                                <th>TOTAL SPEND</th>
+                                <th>PURCHASES</th>
+                                <th>DEPENDENTS</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <!-- Rows loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button class="page-btn" id="prevPageBtn">Previous</button>
+                    <div class="page-numbers" id="pageNumbersContainer">
+                        <!-- Dynamically generated by JS -->
+                    </div>
+                    <button class="page-btn" id="nextPageBtn">Next</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
